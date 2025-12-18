@@ -5,12 +5,13 @@ import LessonPlanDisplay from './components/LessonPlanDisplay';
 import Auth from './components/Auth';
 import History from './components/History';
 import Dashboard from './components/Dashboard';
+import AdminPanel from './components/AdminPanel';
 import { generateLessonPlan } from './services/gemini';
 import { LessonPlanInput, GeneratedLessonPlan, User, SavedItem } from './types';
-import { BrainCircuit, LogOut, User as UserIcon } from 'lucide-react';
+import { BrainCircuit, LogOut, User as UserIcon, Shield } from 'lucide-react';
 
 function App() {
-  const [view, setView] = useState<'landing' | 'auth' | 'form' | 'display' | 'history' | 'dashboard'>('landing');
+  const [view, setView] = useState<'landing' | 'auth' | 'form' | 'display' | 'history' | 'dashboard' | 'admin'>('landing');
   const [isLoading, setIsLoading] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<GeneratedLessonPlan | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -22,7 +23,12 @@ function App() {
   useEffect(() => {
     const savedUser = localStorage.getItem('lessonPlannerUser');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+      // Redirect to admin if stored user is admin and currently on landing
+      if (parsedUser.role === 'admin' && view === 'landing') {
+        // We let the user choose where to go, or landing will handle it
+      }
     }
     const savedHistory = localStorage.getItem('lessonPlannerHistory');
     if (savedHistory) {
@@ -33,7 +39,11 @@ function App() {
   const handleLogin = (userData: User) => {
     setUser(userData);
     localStorage.setItem('lessonPlannerUser', JSON.stringify(userData));
-    setView('form');
+    if (userData.role === 'admin') {
+      setView('admin');
+    } else {
+      setView('form');
+    }
   };
 
   const handleLogout = () => {
@@ -44,7 +54,11 @@ function App() {
 
   const handleStart = () => {
     if (user) {
-      setView('form');
+      if (user.role === 'admin') {
+        setView('admin');
+      } else {
+        setView('form');
+      }
     } else {
       setView('auth');
     }
@@ -129,29 +143,45 @@ function App() {
                 </div>
               </div>
               <div className="flex items-center space-x-6">
-                {view !== 'history' && (
-                  <button 
-                    onClick={() => setView('history')}
-                    className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
-                  >
-                    History
-                  </button>
-                )}
-                {view !== 'form' && (
-                  <button 
-                    onClick={() => setView('form')}
-                    className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
-                  >
-                    New Lesson
-                  </button>
+                {/* Admin-specific Navigation */}
+                {user?.role === 'admin' ? (
+                  <>
+                    <button 
+                      onClick={() => setView('admin')}
+                      className={`text-sm font-medium transition-colors ${view === 'admin' ? 'text-blue-600' : 'text-slate-600 hover:text-blue-600'}`}
+                    >
+                      Admin Panel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {/* Teacher-specific Navigation */}
+                    {view !== 'history' && (
+                      <button 
+                        onClick={() => setView('history')}
+                        className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
+                      >
+                        History
+                      </button>
+                    )}
+                    {view !== 'form' && (
+                      <button 
+                        onClick={() => setView('form')}
+                        className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
+                      >
+                        New Lesson
+                      </button>
+                    )}
+                  </>
                 )}
                 
+                {/* Profile Button - Hidden for pure admin view maybe? No, keep it. */}
                 <button 
                   onClick={() => setView('dashboard')}
                   className="hidden md:flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 hover:bg-slate-200 transition-colors"
                 >
-                  <div className="h-6 w-6 rounded-full bg-brand-200 flex items-center justify-center text-brand-700 font-bold text-xs">
-                    {user?.name.charAt(0).toUpperCase()}
+                  <div className={`h-6 w-6 rounded-full flex items-center justify-center font-bold text-xs ${user?.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-brand-200 text-brand-700'}`}>
+                    {user?.role === 'admin' ? <Shield className="w-3 h-3" /> : user?.name.charAt(0).toUpperCase()}
                   </div>
                   <span className="text-sm font-medium text-slate-600">{user?.name}</span>
                 </button>
@@ -178,6 +208,7 @@ function App() {
             onLogout={handleLogout}
             onViewHistory={() => setView('history')}
             onViewDashboard={() => setView('dashboard')}
+            onViewAdmin={() => setView('admin')}
           />
         )}
 
@@ -188,6 +219,12 @@ function App() {
         {view === 'dashboard' && user && (
           <div className="animate-fade-in">
             <Dashboard user={user} onUpdateUser={handleUpdateUser} />
+          </div>
+        )}
+
+        {view === 'admin' && user?.role === 'admin' && (
+          <div className="animate-fade-in">
+            <AdminPanel />
           </div>
         )}
 

@@ -17,7 +17,8 @@ import {
   LogOut,
   User as UserIcon,
   History,
-  LayoutDashboard
+  LayoutDashboard,
+  Shield
 } from 'lucide-react';
 import { User } from '../types';
 
@@ -27,9 +28,10 @@ interface LandingProps {
   onLogout: () => void;
   onViewHistory?: () => void;
   onViewDashboard?: () => void;
+  onViewAdmin?: () => void;
 }
 
-const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistory, onViewDashboard }) => {
+const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistory, onViewDashboard, onViewAdmin }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const scrollToSection = (id: string) => {
@@ -61,12 +63,22 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
               <button onClick={() => scrollToSection('about')} className="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">About</button>
               <button onClick={() => scrollToSection('features')} className="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Features</button>
               <button onClick={() => scrollToSection('contact')} className="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Contact</button>
-              {user && onViewHistory && (
+              
+              {user && user.role !== 'admin' && onViewHistory && (
                 <button 
                   onClick={onViewHistory}
                   className="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors"
                 >
                   History
+                </button>
+              )}
+
+              {user && user.role === 'admin' && onViewAdmin && (
+                <button 
+                  onClick={onViewAdmin}
+                  className="text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors flex items-center gap-1"
+                >
+                  <Shield className="w-4 h-4" /> Admin
                 </button>
               )}
             </div>
@@ -102,7 +114,7 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
                 onClick={onStart}
                 className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-2.5 px-6 rounded-full shadow-lg shadow-brand-500/30 transition-all hover:-translate-y-0.5 hover:shadow-xl"
               >
-                {user ? 'Go to Planner' : 'Get Started'}
+                {user ? (user.role === 'admin' ? 'Admin Panel' : 'Go to Planner') : 'Get Started'}
               </button>
             </div>
 
@@ -122,11 +134,14 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
               <button onClick={() => scrollToSection('about')} className="text-left font-medium text-slate-600">About</button>
               <button onClick={() => scrollToSection('features')} className="text-left font-medium text-slate-600">Features</button>
               <button onClick={() => scrollToSection('contact')} className="text-left font-medium text-slate-600">Contact</button>
-              {user && onViewHistory && (
+              {user && user.role !== 'admin' && onViewHistory && (
                 <button onClick={onViewHistory} className="text-left font-medium text-slate-600">History</button>
               )}
               {user && onViewDashboard && (
                 <button onClick={onViewDashboard} className="text-left font-medium text-slate-600">Dashboard</button>
+              )}
+              {user && user.role === 'admin' && onViewAdmin && (
+                <button onClick={onViewAdmin} className="text-left font-medium text-purple-600">Admin Panel</button>
               )}
               <hr className="border-slate-100" />
               {user ? (
@@ -141,7 +156,7 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
                 <button onClick={onStart} className="text-left font-medium text-slate-600">Sign In</button>
               )}
               <button onClick={onStart} className="bg-brand-600 text-white font-semibold py-3 rounded-lg text-center">
-                {user ? 'Go to Planner' : 'Get Started'}
+                {user ? (user.role === 'admin' ? 'Admin Panel' : 'Go to Planner') : 'Get Started'}
               </button>
             </div>
           </div>
@@ -177,7 +192,7 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
               onClick={onStart}
               className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-lg font-semibold py-4 px-8 rounded-xl shadow-xl shadow-brand-500/20 transition-all hover:-translate-y-1"
             >
-              {user ? 'Go to Planner' : 'Get Started'}
+              {user ? (user.role === 'admin' ? 'Admin Panel' : 'Go to Planner') : 'Get Started'}
               <ArrowRight className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-6 px-6 text-sm font-medium text-slate-500">

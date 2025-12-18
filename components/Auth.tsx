@@ -23,9 +23,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     setTimeout(() => {
       setIsLoading(false);
       // Mock successful login/signup
+      // If email starts with 'admin', assign admin role
+      const role = formData.email.toLowerCase().startsWith('admin') ? 'admin' : 'teacher';
+      
       const user: User = {
         name: isLogin ? (formData.email.split('@')[0]) : formData.name, // Fallback name for login
-        email: formData.email
+        email: formData.email,
+        role: role as 'admin' | 'teacher'
       };
       onLogin(user);
     }, 1500);

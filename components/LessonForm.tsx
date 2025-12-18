@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GradeCurriculum, LessonPlanInput, Strand, SubStrand, UploadedFile, User } from '../types';
-import { SUBJECT_CURRICULA } from '../data/curriculum';
+import { getCurricula } from '../services/curriculumStore'; // Updated import
 import { BookOpen, Layers, Upload, X, FileText, Image as ImageIcon, Sparkles } from 'lucide-react';
 
 interface LessonFormProps {
@@ -10,6 +10,9 @@ interface LessonFormProps {
 }
 
 const LessonForm: React.FC<LessonFormProps> = ({ onSubmit, isLoading, user }) => {
+  // Load dynamic curriculum data
+  const [allCurricula, setAllCurricula] = useState<Record<string, GradeCurriculum[]>>(getCurricula());
+
   const [formData, setFormData] = useState<LessonPlanInput>({
     teacherName: user?.name || '',
     schoolName: user?.schoolName || '',
@@ -26,13 +29,32 @@ const LessonForm: React.FC<LessonFormProps> = ({ onSubmit, isLoading, user }) =>
   });
 
   // Derived state for dropdown options
-  const [activeCurriculum, setActiveCurriculum] = useState<GradeCurriculum[]>(SUBJECT_CURRICULA['Mathematics']);
+  const [activeCurriculum, setActiveCurriculum] = useState<GradeCurriculum[]>([]);
   const [activeGradeData, setActiveGradeData] = useState<GradeCurriculum | null>(null);
   const [activeStrandData, setActiveStrandData] = useState<Strand | null>(null);
   const [activeSubStrandData, setActiveSubStrandData] = useState<SubStrand | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Update defaults if user object changes (e.g. after updating profile)
+  // Reload curriculum data on mount (in case it changed)
+  useEffect(() => {
+    setAllCurricula(getCurricula());
+  }, []);
+
+  // Set initial active curriculum
+  useEffect(() => {
+    if (allCurricula[formData.subject]) {
+      setActiveCurriculum(allCurricula[formData.subject]);
+    } else {
+      // Fallback if subject not found
+      const firstSubject = Object.keys(allCurricula)[0];
+      if (firstSubject) {
+        setFormData(prev => ({ ...prev, subject: firstSubject }));
+        setActiveCurriculum(allCurricula[firstSubject]);
+      }
+    }
+  }, [allCurricula]);
+
+  // Update defaults if user object changes
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
@@ -43,25 +65,27 @@ const LessonForm: React.FC<LessonFormProps> = ({ onSubmit, isLoading, user }) =>
     }
   }, [user]);
 
+  // Handle Subject Change
   useEffect(() => {
-    const curriculum = SUBJECT_CURRICULA[formData.subject] || SUBJECT_CURRICULA['Mathematics'];
+    const curriculum = allCurricula[formData.subject] || [];
     setActiveCurriculum(curriculum);
     
-    // Reset grade if it doesn't exist in new curriculum (unlikely but safe)
+    // Reset grade if it doesn't exist in new curriculum
     if (formData.grade) {
        const grade = curriculum.find(g => g.name === formData.grade) || null;
        setActiveGradeData(grade);
        if (!grade) {
          setFormData(prev => ({ ...prev, grade: '', strand: '', subStrand: '', lesson: '' }));
        } else {
-         // If grade exists, check if strand exists in new subject
+         // If grade exists, check if strand exists
          if (!grade.strands.find(s => s.name === formData.strand)) {
            setFormData(prev => ({ ...prev, strand: '', subStrand: '', lesson: '' }));
          }
        }
     }
-  }, [formData.subject]);
+  }, [formData.subject, allCurricula]);
 
+  // Handle Grade Change
   useEffect(() => {
     if (formData.grade) {
       const grade = activeCurriculum.find(g => g.name === formData.grade) || null;
@@ -69,9 +93,12 @@ const LessonForm: React.FC<LessonFormProps> = ({ onSubmit, isLoading, user }) =>
       if (!grade?.strands.find(s => s.name === formData.strand)) {
          setFormData(prev => ({ ...prev, strand: '', subStrand: '', lesson: '' }));
       }
+    } else {
+      setActiveGradeData(null);
     }
   }, [formData.grade, activeCurriculum]);
 
+  // Handle Strand Change
   useEffect(() => {
     if (activeGradeData && formData.strand) {
       const strand = activeGradeData.strands.find(s => s.name === formData.strand) || null;
@@ -84,6 +111,7 @@ const LessonForm: React.FC<LessonFormProps> = ({ onSubmit, isLoading, user }) =>
     }
   }, [activeGradeData, formData.strand]);
 
+  // Handle SubStrand Change
   useEffect(() => {
     if (activeStrandData && formData.subStrand) {
       const subStrand = activeStrandData.subStrands.find(s => s.name === formData.subStrand) || null;
@@ -144,6 +172,14 @@ const LessonForm: React.FC<LessonFormProps> = ({ onSubmit, isLoading, user }) =>
     e.preventDefault();
     onSubmit(formData);
   };
+
+  // Determine if specific lesson selection is required
+  // If no strands are available for the selected grade (newly added grade), we allow generation without specific lesson details
+  const isLessonSelectionDisabled = !activeSubStrandData;
+  const isLessonRequired = activeSubStrandData && activeSubStrandData.lessons.length > 0;
+  
+  // New logic: If the grade has no strands (it's new), we let the user type the topic manually or it's optional
+  const hasStructure = activeGradeData && activeGradeData.strands.length > 0;
 
   return (
     <div className="w-full max-w-6xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden border border-slate-100">
@@ -207,7 +243,7 @@ const LessonForm: React.FC<LessonFormProps> = ({ onSubmit, isLoading, user }) =>
                     value={formData.subject}
                     onChange={(e) => handleChange('subject', e.target.value)}
                   >
-                    {Object.keys(SUBJECT_CURRICULA).map(subject => (
+                    {Object.keys(allCurricula).map(subject => (
                       <option key={subject} value={subject}>{subject}</option>
                     ))}
                   </select>
@@ -257,60 +293,96 @@ const LessonForm: React.FC<LessonFormProps> = ({ onSubmit, isLoading, user }) =>
 
         {/* Middle Section: Curriculum Selection */}
         <div className="space-y-6">
-          <h3 className="text-lg font-semibold text-slate-700 border-b border-slate-200 pb-2">
-            Curriculum Selection
-          </h3>
+          <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+             <h3 className="text-lg font-semibold text-slate-700">Curriculum Selection</h3>
+             {!hasStructure && formData.grade && (
+                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                  No preset topics for this grade. Please enter lesson details manually.
+                </span>
+             )}
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Strand */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">Strand</label>
-              <select 
-                required
-                disabled={!activeGradeData}
-                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400 transition-all"
-                value={formData.strand}
-                onChange={(e) => handleChange('strand', e.target.value)}
-              >
-                <option value="">Select Strand</option>
-                {activeGradeData?.strands.map(s => (
-                  <option key={s.id} value={s.name}>{s.name}</option>
-                ))}
-              </select>
+              {hasStructure ? (
+                <select 
+                  required
+                  disabled={!activeGradeData}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400 transition-all"
+                  value={formData.strand}
+                  onChange={(e) => handleChange('strand', e.target.value)}
+                >
+                  <option value="">Select Strand</option>
+                  {activeGradeData?.strands.map(s => (
+                    <option key={s.id} value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+              ) : (
+                <input 
+                  type="text"
+                  placeholder="Enter Strand (e.g., Numbers)"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  value={formData.strand}
+                  onChange={(e) => handleChange('strand', e.target.value)}
+                />
+              )}
             </div>
 
             {/* Sub-Strand */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">Sub-strand</label>
-              <select 
-                required
-                disabled={!activeStrandData}
-                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400 transition-all"
-                value={formData.subStrand}
-                onChange={(e) => handleChange('subStrand', e.target.value)}
-              >
-                <option value="">Select Sub-strand</option>
-                {activeStrandData?.subStrands.map(s => (
-                  <option key={s.id} value={s.name}>{s.name}</option>
-                ))}
-              </select>
+              {hasStructure ? (
+                <select 
+                  required
+                  disabled={!activeStrandData}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400 transition-all"
+                  value={formData.subStrand}
+                  onChange={(e) => handleChange('subStrand', e.target.value)}
+                >
+                  <option value="">Select Sub-strand</option>
+                  {activeStrandData?.subStrands.map(s => (
+                    <option key={s.id} value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+              ) : (
+                 <input 
+                  type="text"
+                  placeholder="Enter Sub-strand"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  value={formData.subStrand}
+                  onChange={(e) => handleChange('subStrand', e.target.value)}
+                />
+              )}
             </div>
 
             {/* Lesson */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">Specific Lesson</label>
-              <select 
-                required
-                disabled={!activeSubStrandData}
-                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400 transition-all"
-                value={formData.lesson}
-                onChange={(e) => handleChange('lesson', e.target.value)}
-              >
-                <option value="">Select Lesson</option>
-                {activeSubStrandData?.lessons.map(l => (
-                  <option key={l.id} value={l.name}>{l.name}</option>
-                ))}
-              </select>
+              {hasStructure ? (
+                <select 
+                  required={isLessonRequired}
+                  disabled={isLessonSelectionDisabled}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400 transition-all"
+                  value={formData.lesson}
+                  onChange={(e) => handleChange('lesson', e.target.value)}
+                >
+                  <option value="">Select Lesson</option>
+                  {activeSubStrandData?.lessons.map(l => (
+                    <option key={l.id} value={l.name}>{l.name}</option>
+                  ))}
+                </select>
+              ) : (
+                 <input 
+                  type="text"
+                  placeholder="Enter Lesson Topic"
+                  required
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  value={formData.lesson}
+                  onChange={(e) => handleChange('lesson', e.target.value)}
+                />
+              )}
             </div>
           </div>
         </div>

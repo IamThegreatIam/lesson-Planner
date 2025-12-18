@@ -51,6 +51,16 @@ export interface User {
   name: string;
   email: string;
   schoolName?: string;
+  role?: 'admin' | 'teacher';
+}
+
+export interface UserActivity {
+  id: string;
+  name: string;
+  email: string;
+  school: string;
+  lastLogin: string;
+  status: 'active' | 'inactive';
 }
 
 export interface SavedItem {
