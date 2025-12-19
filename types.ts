@@ -1,3 +1,4 @@
+
 export interface Lesson {
   id: string;
   name: string;
@@ -51,6 +52,8 @@ export interface User {
   name: string;
   email: string;
   schoolName?: string;
+  phone?: string;
+  location?: string;
   role?: 'admin' | 'teacher';
 }
 

@@ -1,3 +1,4 @@
+
 import { GoogleGenAI } from "@google/genai";
 import { LessonPlanInput } from "../types";
 
@@ -8,7 +9,7 @@ Your task is to generate professional, high-quality, and curriculum-aligned less
 **Guidelines:**
 1.  **Audience:** Professional Kenyan teacher. Tone: Formal, pedagogical, instructional.
 2.  **Length:** The body content MUST be approximately 400 words.
-3.  **Curriculum Alignment:** Strictly adhere to the Kenyan CBE curriculum for the selected subject (Mathematics or Pre-Technical Studies).
+3.  **Curriculum Alignment:** Strictly adhere to the Kenyan CBE curriculum for the selected subject.
 4.  **Core Competencies:** Explicitly embed: Communication/Collaboration, Critical Thinking/Problem Solving, Creativity, Digital Literacy, Learning to Learn, Citizenship, Self-Efficacy.
 5.  **Values:** Integrate: Respect, Unity, Responsibility, Patriotism, Peace, Love, Integrity, Social Justice.
 
@@ -80,25 +81,16 @@ export const generateLessonPlan = async (inputs: LessonPlanInput): Promise<strin
       - Use ACTIVE LEARNING and CONSTRUCTIVIST approaches.
       - Include ASSESSMENT FOR LEARNING strategies.
       - Ensure the "Lesson Development" section is detailed and instructional.
-      - Use terminology relevant to ${inputs.subject}.
     `;
 
-    // Add additional text context if provided
     if (inputs.additionalText) {
-      promptText += `\n\n**Teacher's Additional Notes/Context:**\n${inputs.additionalText}\nPlease incorporate these specific notes into the lesson plan activities or resources where appropriate.`;
+      promptText += `\n\n**Teacher's Additional Notes:**\n${inputs.additionalText}`;
     }
 
-    if (inputs.files && inputs.files.length > 0) {
-      promptText += `\n\n**Attached Materials:**\nI have attached images or documents related to this lesson. Please analyze them and ensure the lesson plan (specifically the examples, exercises, or content delivery) aligns with the content in these attachments.`;
-    }
-
-    // Build the request parts
     const parts: any[] = [{ text: promptText }];
 
-    // Add files if they exist
     if (inputs.files && inputs.files.length > 0) {
       inputs.files.forEach(file => {
-        // Clean base64 string (remove data URL prefix if present)
         const cleanBase64 = file.data.split(',')[1] || file.data;
         parts.push({
           inlineData: {
@@ -110,7 +102,7 @@ export const generateLessonPlan = async (inputs: LessonPlanInput): Promise<strin
     }
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: {
         role: 'user',
         parts: parts
@@ -137,48 +129,17 @@ export const generateLessonNotes = async (lessonPlan: string): Promise<string> =
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
     const prompt = `
-      Based on the provided lesson plan, generate comprehensive "Board Notes" for students to copy into their notebooks.
-      
-      **CRITICAL REQUIREMENTS:**
-      1.  **Length:** The notes MUST be between **400 and 500 words**. Do not generate short summaries. Provide detailed explanations.
-      2.  **Format:** Structured exactly like a teacher writing on a blackboard.
-      3.  **Style:** Direct, factual, clear, and explanatory. No teacher instructions like "Tell the class...".
-      
-      **STRICT STRUCTURE & EXAMPLE:**
-      
-      **TOPIC: [INSERT TOPIC NAME]**
-      
-      **1. INTRODUCTION / DEFINITION**
-      *   **[Concept Name]:** [Detailed definition of the concept. Explain what it is, its origin, or its basic principle.]
-      *   [Additional explanatory sentence to clarify the definition further.]
-      
-      **2. [KEY CONCEPTS / TYPES / CHARACTERISTICS]**
-      *   **[Point 1]:** [State the point clearly]. [Follow with a detailed explanation of 1-2 sentences describing why this point is important or how it works].
-      *   **[Point 2]:** [State the point]. [Detailed explanation...].
-      *   **[Point 3]:** [State the point]. [Detailed explanation...].
-      
-      **3. DETAILED EXPLANATION**
-      *   [Provide a deeper dive into the mechanics or details of the topic. Use bullet points to break down complex ideas into digestible parts for students.]
-      *   [Ensure this section is substantial to meet the word count requirements.]
-      
-      **4. EXAMPLES / ILLUSTRATIONS**
-      *   **Example 1:** [State the problem or scenario clearly]
-          *   **Solution:** [Provide a step-by-step working or explanation of the solution]
-      *   **Example 2:** [State a different problem or scenario]
-          *   **Solution:** [Provide a step-by-step working or explanation]
-      
-      **5. SUMMARY / CONCLUSION**
-      *   [A brief bullet point summarizing the main takeaway of the lesson.]
-
-      **Content Source (Lesson Plan):**
+      Based on the provided lesson plan, generate comprehensive "Board Notes" for students to copy.
+      Length: 400-500 words. Structure with Topics, Definitions, Detailed points, and Examples.
+      Content:
       ${lessonPlan}
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
-        temperature: 0.5, // Lower temperature for more deterministic/factual output
+        temperature: 0.5,
       }
     });
 
@@ -194,20 +155,12 @@ export const generatePracticeQuestions = async (lessonPlan: string): Promise<str
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
     const prompt = `
-      Based on the following lesson plan, generate 10 practice questions for students.
-      
-      **Requirements:**
-      - **Quantity:** 10 Questions numbered 1-10.
-      - **Types:** Mix of multiple choice, short answer, and one problem-solving/application question.
-      - **Relevance:** Directly test the Specific Learning Outcomes from the lesson plan.
-      - **Answer Key:** Include a "Marking Scheme" or "Answer Key" section at the very end of the output.
-      
-      **Lesson Plan Context:**
+      Generate 10 practice questions (with answers at the end) based on this lesson plan:
       ${lessonPlan}
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
         temperature: 0.7,
