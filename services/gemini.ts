@@ -1,5 +1,5 @@
 
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { LessonPlanInput } from "../types";
 
 const SYSTEM_INSTRUCTION = `
@@ -101,10 +101,10 @@ export const generateLessonPlan = async (inputs: LessonPlanInput): Promise<strin
       });
     }
 
-    const response = await ai.models.generateContent({
+    // Fix: Using correct GenerateContentResponse type and removing unnecessary role: 'user'
+    const response: GenerateContentResponse = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: {
-        role: 'user',
         parts: parts
       },
       config: {
@@ -135,7 +135,8 @@ export const generateLessonNotes = async (lessonPlan: string): Promise<string> =
       ${lessonPlan}
     `;
 
-    const response = await ai.models.generateContent({
+    // Fix: Using correct GenerateContentResponse type
+    const response: GenerateContentResponse = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
@@ -159,7 +160,8 @@ export const generatePracticeQuestions = async (lessonPlan: string): Promise<str
       ${lessonPlan}
     `;
 
-    const response = await ai.models.generateContent({
+    // Fix: Using correct GenerateContentResponse type
+    const response: GenerateContentResponse = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
