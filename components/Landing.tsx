@@ -11,7 +11,11 @@ import {
   Search,
   ExternalLink,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Phone,
+  Mail,
+  MapPin,
+  MessageSquare
 } from 'lucide-react';
 import { User } from '../types';
 import { fetchKenyaEducationNews, NewsItem as NewsType } from '../services/news';
@@ -47,19 +51,13 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
       <div className="bg-caf-dark text-[10px] font-bold text-slate-400 py-1.5 px-4 hidden md:block border-b border-white/5">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex gap-4">
-            <span className="hover:text-white cursor-pointer transition-colors">INSIDE KICD</span>
-            <span className="hover:text-white cursor-pointer transition-colors">CURRICULUM</span>
-            <span className="hover:text-white cursor-pointer transition-colors">NEWS</span>
-            <span className="hover:text-white cursor-pointer transition-colors">PRESS RELEASE</span>
-            <span className="hover:text-white cursor-pointer transition-colors">DOCUMENTS</span>
+            <span className="hover:text-white cursor-pointer transition-colors uppercase">Curriculum Guru</span>
+            <span className="hover:text-white cursor-pointer transition-colors uppercase">KICD Standards</span>
           </div>
           <div className="flex gap-4 items-center">
             <span className="text-white">English</span>
             <span className="hover:text-white cursor-pointer">Kiswahili</span>
             <Search className="w-3 h-3 hover:text-white cursor-pointer" />
-            <span className="bg-slate-700 text-white px-2 py-0.5 rounded flex items-center gap-1 cursor-pointer hover:bg-slate-600">
-              All sections <Menu className="w-2.5 h-2.5" />
-            </span>
           </div>
         </div>
       </div>
@@ -74,17 +72,14 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
                   <BrainCircuit className="w-8 h-8 text-caf-crimson" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xl font-extrabold text-white leading-none tracking-tight">LessonPlanner</span>
-                  <span className="text-[10px] font-bold text-white/80 tracking-[0.2em] uppercase">Kenya Education</span>
+                  <span className="text-xl font-extrabold text-white leading-none tracking-tight uppercase">LessonPlanner</span>
+                  <span className="text-[10px] font-bold text-white/80 tracking-[0.2em] uppercase">The Guru Hub</span>
                 </div>
               </div>
               
               <div className="hidden lg:flex items-center space-x-6">
                 <NavButton label="HOME" sub="Start Here" active />
                 <NavButton label="NEWS" sub="Latest Updates" />
-                <NavButton label="VIDEO" sub="Watch Demos" />
-                <NavButton label="RESOURCES" sub="Curriculum Docs" />
-                <NavButton label="ARCHIVE" sub="Saved Plans" />
               </div>
             </div>
 
@@ -112,11 +107,11 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
               <div className="flex flex-col items-center">
                 <button 
                   onClick={onStart}
-                  className="bg-white text-caf-crimson px-5 py-2.5 rounded-sm text-xs font-black tracking-widest hover:bg-slate-100 transition-colors shadow-lg"
+                  className="bg-white text-caf-crimson px-5 py-2.5 rounded-sm text-xs font-black tracking-widest hover:bg-slate-100 transition-colors shadow-lg uppercase"
                 >
-                  {user ? 'OPEN PLANNER' : 'GET STARTED'}
+                  {user ? 'Open Planner' : 'Get Started'}
                 </button>
-                <span className="text-[8px] text-white mt-1 uppercase font-black tracking-widest">Free for Teachers</span>
+                <span className="text-[8px] text-white mt-1 uppercase font-black tracking-widest">JSS Math Specialist</span>
               </div>
 
               <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden text-white">
@@ -128,7 +123,7 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
       </nav>
 
       {/* Hero Section */}
-      <header className="relative h-[75vh] flex items-center justify-center overflow-hidden">
+      <header className="relative h-[70vh] flex items-center justify-center overflow-hidden">
         <img 
           src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=2500&auto=format&fit=crop" 
           alt="Modern Classroom" 
@@ -143,16 +138,16 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
             </div>
           </div>
           <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter mb-4 animate-fade-in-up uppercase">
-            JSS PLANNER 2025
+            JSS MATH GURU
           </h1>
           <p className="text-lg md:text-xl font-medium text-white/90 tracking-wide mb-8 animate-fade-in-up animation-delay-200">
-            Professional Pedagogical Excellence for the CBC Framework
+            Precision Pedagogy for Grades 7, 8, and 9
           </p>
           <div className="flex flex-col items-center">
             <button onClick={onStart} className="bg-white text-caf-dark px-10 py-4 font-black text-sm tracking-widest hover:scale-105 transition-transform flex items-center gap-3 mx-auto shadow-2xl uppercase">
-              Start Generating Now <ArrowRight className="w-5 h-5" />
+              Generate Lesson Plan <ArrowRight className="w-5 h-5" />
             </button>
-            <span className="text-white/60 text-[10px] mt-4 font-bold uppercase tracking-[0.3em]">Trusted by 5,000+ Kenyan Educators</span>
+            <span className="text-white/60 text-[10px] mt-4 font-bold uppercase tracking-[0.3em]">Curriculum Aligned & Instant</span>
           </div>
         </div>
       </header>
@@ -188,7 +183,7 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-black text-caf-crimson uppercase tracking-widest mb-12 flex items-center gap-3">
-            <span className="w-12 h-1 bg-caf-crimson"></span> COVERED GRADES
+            <span className="w-12 h-1 bg-caf-crimson"></span> JSS COVERAGE
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -214,28 +209,42 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
         </div>
       </section>
 
-      {/* Premium Banner */}
-      <section className="max-w-7xl mx-auto px-4 mb-24">
-         <div className="bg-gradient-to-r from-caf-crimson to-caf-gold p-1 rounded-sm shadow-2xl">
-            <div className="bg-[#1a1a1a] p-8 md:p-12 flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden group">
-               <div className="z-10 space-y-2">
-                  <div className="flex items-center gap-2 mb-4">
-                     <Star className="w-6 h-6 text-caf-gold fill-caf-gold" />
-                     <span className="text-caf-gold font-bold text-sm tracking-[0.3em] uppercase">Premium Access</span>
-                  </div>
-                  <h3 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight">SCHOOL LICENSES ARE <br/><span className="text-caf-gold">NOW OPEN</span></h3>
-               </div>
-               <div className="z-10 flex flex-col items-center">
-                  <button className="bg-caf-gold text-caf-dark px-10 py-4 font-black text-xs tracking-widest uppercase hover:bg-white transition-colors">
-                     Contact sales
-                  </button>
-                  <span className="text-caf-gold/50 text-[9px] mt-2 font-black uppercase tracking-widest">Bulk Discounts for Schools</span>
-               </div>
-               <div className="absolute right-0 top-0 h-full w-1/3 bg-caf-gold opacity-5 rotate-12 translate-x-12"></div>
-               <BrainCircuit className="absolute -right-12 bottom-0 w-64 h-64 text-white opacity-5" />
+      {/* Contact the Guru Section */}
+      <section className="bg-caf-dark py-24 relative overflow-hidden border-y border-caf-gold/20">
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <span className="bg-caf-crimson text-white px-4 py-1 text-[10px] font-black tracking-[0.3em] uppercase mb-6 inline-block rounded-sm">Available for Consultation</span>
+              <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tight mb-8">Contact The <br/><span className="text-caf-gold">Lesson Guru</span></h2>
+              <p className="text-slate-400 text-lg mb-12 leading-relaxed max-w-lg">
+                For curriculum support, school-wide licenses, or specialized pedagogical workshops, reach out to Macdonald Muhiga.
+              </p>
+              
+              <div className="space-y-6">
+                <ContactInfo icon={<Mail className="w-5 h-5" />} label="Email" value="macdonaldmuhiga@gmail.com" />
+                <ContactInfo icon={<Phone className="w-5 h-5" />} label="Phone" value="0710151009 / 0725738254" />
+                <ContactInfo icon={<MapPin className="w-5 h-5" />} label="Location" value="Katani, Kenya" />
+              </div>
             </div>
-         </div>
-      </section>
+            
+            <div className="bg-white/5 backdrop-blur-sm p-8 md:p-12 border border-white/10 rounded-sm">
+               <div className="flex flex-col items-center text-center">
+                  <div className="w-24 h-24 bg-caf-crimson rounded-full flex items-center justify-center text-white text-4xl font-black mb-6">M</div>
+                  <h3 className="text-2xl font-black text-white uppercase mb-2">Macdonald Muhiga</h3>
+                  <p className="text-caf-gold font-bold uppercase tracking-widest text-xs mb-8">Educational Consultant</p>
+                  
+                  <div className="w-full h-px bg-white/10 mb-8"></div>
+                  
+                  <button onClick={() => window.open('https://wa.me/254710151009', '_blank')} className="w-full bg-caf-emerald text-white py-4 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-emerald-600 transition-colors">
+                    <MessageSquare className="w-5 h-5" /> Chat on WhatsApp
+                  </button>
+                  <span className="text-[9px] text-white/40 mt-3 font-black uppercase tracking-widest italic">Typically responds in minutes</span>
+               </div>
+            </div>
+          </div>
+        </div>
+        <div className="absolute right-0 bottom-0 w-1/3 h-1/2 bg-caf-crimson/5 organic-mask"></div>
+      </header>
 
       {/* Dynamic News Feed */}
       <section className="bg-slate-50 py-24 border-t border-slate-200">
@@ -243,9 +252,9 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
           <div className="flex justify-between items-end mb-12">
             <div>
                <h2 className="text-2xl font-black text-caf-crimson uppercase tracking-widest flex items-center gap-3">
-                 <span className="w-12 h-1 bg-caf-crimson"></span> LATEST EDUCATION NEWS
+                 <span className="w-12 h-1 bg-caf-crimson"></span> KENYA EDUCATION NEWS
                </h2>
-               <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Scouted in real-time from Kenya</p>
+               <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Latest CBC & JSS Updates</p>
             </div>
             <div className="flex flex-col items-end">
               <button 
@@ -254,16 +263,15 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
                 className="bg-caf-crimson text-white px-6 py-2 rounded-full font-black text-[10px] tracking-widest uppercase flex items-center gap-2 hover:bg-caf-dark transition-colors"
               >
                 {isNewsLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
-                Refresh News
+                Refresh
               </button>
-              <span className="text-[7px] text-slate-400 mt-1 uppercase font-bold tracking-widest">Powered by Google Search</span>
             </div>
           </div>
 
           {isNewsLoading ? (
             <div className="h-64 flex flex-col items-center justify-center bg-white rounded-xl border-2 border-dashed border-slate-200">
                <Loader2 className="w-12 h-12 text-caf-crimson animate-spin mb-4" />
-               <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Scouting Kenya Education News...</p>
+               <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Fetching Real-time News...</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -280,7 +288,7 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
                        <div className="flex justify-between items-center">
                          <span className="text-white/50 text-[10px] font-bold uppercase tracking-widest">{news[0].date}</span>
                          <a href={news[0].url} target="_blank" rel="noopener" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-xs font-bold transition-colors">
-                            Official Source <ExternalLink className="w-3 h-3" />
+                            Source <ExternalLink className="w-3 h-3" />
                          </a>
                        </div>
                     </div>
@@ -289,7 +297,6 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
 
                <div className="space-y-6">
                   {news.slice(1).map((item, idx) => (
-                    // Fix: Use NewsCard instead of NewsItem component to avoid collision with NewsItem interface name
                     <NewsCard key={idx} item={item} />
                   ))}
                </div>
@@ -306,32 +313,38 @@ const Landing: React.FC<LandingProps> = ({ onStart, user, onLogout, onViewHistor
               <div className="bg-white p-1 rounded-sm">
                 <BrainCircuit className="w-8 h-8 text-caf-crimson" />
               </div>
-              <span className="text-2xl font-black text-white uppercase tracking-tighter">LessonPlanner.JS</span>
+              <span className="text-2xl font-black text-white uppercase tracking-tighter">LessonPlanner.Guru</span>
             </div>
             <p className="max-w-md text-sm leading-relaxed mb-8">
-              Kenya's premier AI-powered lesson plan generation platform. Built specifically for JSS teachers, aligned with the KICD Competency-Based Curriculum.
+              Developed by <span className="text-white font-bold">Macdonald Muhiga</span>. Kenya's premier AI-powered lesson plan generation platform for JSS specialists.
             </p>
+            <div className="space-y-2 text-xs font-bold uppercase tracking-widest">
+              <p className="text-white/40">Contact Information</p>
+              <p className="text-white">Email: macdonaldmuhiga@gmail.com</p>
+              <p className="text-white">Phone: 0710151009 / 0725738254</p>
+              <p className="text-white">Location: Katani, Kenya</p>
+            </div>
           </div>
           <div>
-            <h4 className="text-white font-black text-xs tracking-widest uppercase mb-6">Explore</h4>
+            <h4 className="text-white font-black text-xs tracking-widest uppercase mb-6">Subject Hub</h4>
             <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
-              <li><a href="#" className="hover:text-white transition-colors">Grade 7 Curricula</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Grade 8 Curricula</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Grade 9 Curricula</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Teacher Community</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Math Grade 7</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Math Grade 8</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Math Grade 9</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Consultation</a></li>
             </ul>
           </div>
           <div>
-             <h4 className="text-white font-black text-xs tracking-widest uppercase mb-6">Official Partners</h4>
-             <div className="flex flex-wrap justify-center md:justify-start gap-4 opacity-50 grayscale hover:grayscale-0 transition-all">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[8px] text-slate-900 font-black">KICD</div>
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[8px] text-slate-900 font-black">TSC</div>
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[8px] text-slate-900 font-black">KNEC</div>
-             </div>
+             <h4 className="text-white font-black text-xs tracking-widest uppercase mb-6">Resources</h4>
+             <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
+              <li><a href="#" className="hover:text-white transition-colors">KICD Guidelines</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">TSC Regulations</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">CBC Framework</a></li>
+            </ul>
           </div>
         </div>
         <div className="max-w-7xl mx-auto pt-12 mt-12 border-t border-white/5 text-center">
-           <p className="text-[8px] uppercase tracking-widest font-black text-white/20">© 2025 LessonPlanner.JS • Designed for African Pedagogical Excellence</p>
+           <p className="text-[8px] uppercase tracking-widest font-black text-white/20">© 2025 Macdonald Muhiga • LessonPlanner.Guru • Professional Excellence in Education</p>
         </div>
       </footer>
     </div>
@@ -344,7 +357,7 @@ const NavButton = ({ label, sub, active = false }: { label: string, sub: string,
     <button className={`text-xs font-black tracking-widest transition-colors ${active ? 'text-white border-b-2 border-white pb-1' : 'text-white/60 hover:text-white'}`}>
       {label}
     </button>
-    <span className="text-[7px] text-white/30 uppercase font-black tracking-widest mt-1 group-hover:text-white/60">{sub}</span>
+    <span className="text-[7px] text-white/30 uppercase font-black tracking-widest mt-1">{sub}</span>
   </div>
 );
 
@@ -359,7 +372,7 @@ const GradeCard = ({ name, desc, img, btnSub }: { name: string, desc: string, im
       <p className="text-white/70 text-sm mb-8 font-medium leading-relaxed">{desc}</p>
       <div className="flex flex-col items-start">
         <button className="bg-white text-caf-crimson px-6 py-2 text-[10px] font-black tracking-widest uppercase hover:bg-slate-100 transition-colors">
-          View More
+          View Detail
         </button>
         <span className="text-[7px] text-white/50 mt-2 font-black uppercase tracking-widest">{btnSub}</span>
       </div>
@@ -367,9 +380,20 @@ const GradeCard = ({ name, desc, img, btnSub }: { name: string, desc: string, im
   </div>
 );
 
-// Fix: Renamed NewsItem to NewsCard and explicitly type as React.FC to fix TypeScript error on usage line 292
+const ContactInfo = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) => (
+  <div className="flex items-start gap-4">
+    <div className="bg-caf-crimson p-2 rounded-sm text-white">
+      {icon}
+    </div>
+    <div>
+      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{label}</p>
+      <p className="text-white font-bold text-sm">{value}</p>
+    </div>
+  </div>
+);
+
 const NewsCard: React.FC<{ item: NewsType }> = ({ item }) => (
-  <div className="group cursor-pointer bg-white p-6 border border-slate-200 hover:border-caf-crimson transition-all rounded-sm">
+  <div className="group cursor-pointer bg-white p-6 border border-slate-200 hover:border-caf-crimson transition-all rounded-sm shadow-sm hover:shadow-md">
      <h4 className="text-sm font-bold text-slate-900 group-hover:text-caf-crimson transition-colors uppercase leading-snug mb-3">
        {item.title}
      </h4>
@@ -377,7 +401,7 @@ const NewsCard: React.FC<{ item: NewsType }> = ({ item }) => (
      <div className="flex justify-between items-center">
        <p className="text-slate-400 text-[9px] font-bold uppercase tracking-widest">{item.date}</p>
        <a href={item.url} target="_blank" rel="noopener" className="text-caf-crimson text-[9px] font-black uppercase tracking-widest flex items-center gap-1 hover:underline">
-         Source <ExternalLink className="w-2 h-2" />
+         Read More <ExternalLink className="w-2 h-2" />
        </a>
      </div>
   </div>
